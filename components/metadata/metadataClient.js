@@ -112,6 +112,14 @@ export function importConfig(config) {
   });
 }
 
+export function fetchModels(provider, apiKey) {
+  return requestJson("/api/ai/models", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ provider, apiKey }),
+  });
+}
+
 export function lookupApp({ bundleId, appStoreId }) {
   return requestJson("/api/app-lookup", {
     method: "POST",

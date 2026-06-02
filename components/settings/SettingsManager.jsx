@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import {
   exportConfig,
+  fetchModels,
   importConfig,
   loadSettings,
   saveSettings,
@@ -62,6 +63,8 @@ export default function SettingsManager() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [models, setModels] = useState([]);
+  const [fetchingModels, setFetchingModels] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -125,6 +128,30 @@ export default function SettingsManager() {
       setError(uploadError.message);
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleFetchModels() {
+    setFetchingModels(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const provider = form.aiProvider || "anthropic";
+      const payload = await fetchModels(provider, form.aiApiKey);
+      const fetched = payload.models || [];
+
+      setModels(fetched);
+      setMessage(
+        fetched.length > 0
+          ? `Loaded ${fetched.length} model(s) from ${provider}.`
+          : `No models returned for ${provider}.`,
+      );
+    } catch (fetchError) {
+      setModels([]);
+      setError(fetchError.message);
+    } finally {
+      setFetchingModels(false);
     }
   }
 
@@ -316,7 +343,11 @@ export default function SettingsManager() {
               <select
                 disabled={loading || saving}
                 value={form.aiProvider || "anthropic"}
-                onChange={(event) => updateField("aiProvider", event.target.value)}
+                onChange={(event) => {
+                  updateField("aiProvider", event.target.value);
+                  // Fetched models belong to the previous provider.
+                  setModels([]);
+                }}
               >
                 {AI_PROVIDER_OPTIONS.map(([value, label]) => (
                   <option key={value} value={value}>
@@ -328,13 +359,47 @@ export default function SettingsManager() {
             </label>
             <label>
               <span className="field-label">Model</span>
-              <input
-                disabled={loading || saving}
-                placeholder={aiDefaultModel}
-                value={form.aiModel}
-                onChange={(event) => updateField("aiModel", event.target.value)}
-              />
-              <p className="field-hint">Leave blank to use the default ({aiDefaultModel}).</p>
+              {models.length > 0 ? (
+                <select
+                  disabled={loading || saving}
+                  value={models.some((model) => model.id === form.aiModel) ? form.aiModel : ""}
+                  onChange={(event) => updateField("aiModel", event.target.value)}
+                >
+                  <option value="">Default ({aiDefaultModel})</option>
+                  {models.map((model) => (
+                    <option key={model.id} value={model.id}>
+                      {model.label === model.id ? model.id : `${model.label} (${model.id})`}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  disabled={loading || saving}
+                  placeholder={aiDefaultModel}
+                  value={form.aiModel}
+                  onChange={(event) => updateField("aiModel", event.target.value)}
+                />
+              )}
+              <div className="model-fetch-row">
+                <button
+                  className="ghost-button"
+                  disabled={loading || saving || fetchingModels}
+                  type="button"
+                  onClick={handleFetchModels}
+                >
+                  {fetchingModels ? "Fetching…" : "Fetch models"}
+                </button>
+                {models.length > 0 ? (
+                  <button className="text-button" type="button" onClick={() => setModels([])}>
+                    Enter manually
+                  </button>
+                ) : null}
+              </div>
+              <p className="field-hint">
+                {models.length > 0
+                  ? `${models.length} model(s) from your provider. Leave on Default to use ${aiDefaultModel}.`
+                  : `Leave blank to use the default (${aiDefaultModel}), or fetch the live list from your provider.`}
+              </p>
             </label>
             <label>
               <span className="field-label">

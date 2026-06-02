@@ -786,6 +786,12 @@ code {
   line-height: 1.45;
 }
 
+.model-fetch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .key-file {
   display: flex;
   align-items: center;
