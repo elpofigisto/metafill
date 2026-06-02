@@ -14,6 +14,16 @@ machine with your own keys (BYOK), and sends nothing to any poTeam server.
 > review the markets that matter most before shipping. For the long tail of
 > locales, a solid machine translation beats leaving them in English.
 
+## 📚 Documentation
+
+- 🚀 [Getting started](docs/getting-started.md) - install, set up keys, first run.
+- 🧭 [Interface guide](docs/interface.md) - every screen and button explained.
+- 👥 [Team collaboration](docs/collaboration.md) - share your setup and split locale
+  work across a team.
+- 💻 [Command-line usage](docs/cli.md) - the npm scripts and bring-your-own-model
+  translation.
+- 🗺️ [Roadmap](docs/roadmap.md) - ideas and planned work.
+
 ## Features
 
 - Manage multiple apps (iOS, macOS, tvOS), each with its own metadata folder.
@@ -27,14 +37,6 @@ machine with your own keys (BYOK), and sends nothing to any poTeam server.
 - Review per locale, then publish to your App Store Connect draft. metafill
   never submits for review; you do that yourself.
 - Export your config to share with teammates (keys are never included).
-
-## Documentation
-
-- [Getting started](docs/getting-started.md) - install, set up keys, first run.
-- [Interface guide](docs/interface.md) - every screen and button explained.
-- [Command-line usage](docs/cli.md) - the npm scripts and bring-your-own-model
-  translation.
-- [Roadmap](docs/roadmap.md) - ideas and planned work.
 
 ## Quick start
 
