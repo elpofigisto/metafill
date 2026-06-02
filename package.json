@@ -1,0 +1,32 @@
+{
+  "name": "metafill",
+  "version": "1.0.0",
+  "description": "Fill App Store metadata in every App Store language: edit, machine-translate, review, and publish across apps and locales. Local, BYOK.",
+  "license": "MIT",
+  "author": "Oleksandr Kozlovskyi (poTeam) (https://poteam.pro)",
+  "homepage": "https://poteam.pro",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elpofigisto/metafill.git"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "deliver:metadata": "node scripts/deliver-app-store-metadata.mjs",
+    "fetch:metadata": "node scripts/fetch-app-store-metadata.mjs",
+    "translate:metadata": "node scripts/translate-app-store-metadata.mjs",
+    "prompt:translations": "node scripts/build-translation-prompt.mjs",
+    "import:translations": "node scripts/import-translations.mjs"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

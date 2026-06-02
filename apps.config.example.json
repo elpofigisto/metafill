@@ -1,0 +1,22 @@
+{
+  "settings": {
+    "teamId": "",
+    "apiKeyId": "",
+    "apiIssuerId": "",
+    "apiKeyPath": ""
+  },
+  "apps": [
+    {
+      "id": "example",
+      "name": "Example App",
+      "metadataPath": "apps/example/fastlane/metadata",
+      "appStoreId": "",
+      "bundleId": "com.example.app",
+      "platform": "ios",
+      "teamId": "",
+      "apiKeyId": "",
+      "apiIssuerId": "",
+      "apiKeyPath": ""
+    }
+  ]
+}

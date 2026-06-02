@@ -1,0 +1,27 @@
+# dependencies & build
+node_modules
+.next
+out
+npm-debug.log*
+
+# secrets / credentials
+.env
+.env.local
+*.p8
+
+# local config (contains account IDs) — share via Settings → Export JSON.
+# A template lives in apps.config.example.json.
+apps.config.json
+
+# operation logs (generated per run)
+logs/
+
+# generated translation prompts + Gemini batch output
+gemini/
+
+# playwright / browser test artifacts
+.playwright-mcp/
+
+# app metadata content (your products' listings) — generated/edited locally
+/fastlane/metadata/
+/apps/
