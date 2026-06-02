@@ -66,9 +66,11 @@ export function LocalePane({ actions, computed, state }) {
               type="button"
               onClick={actions.translateSelectedLocale}
               title={
-                computed.canTranslateSelected
-                  ? "Translate this language from en-US"
-                  : "Add en-US source content first"
+                !computed.aiConfigured
+                  ? "Add an AI API key in Settings to translate"
+                  : !computed.selectedLocaleHasSource
+                    ? "Add en-US source content first"
+                    : "Translate this language from en-US"
               }
             >
               {busyAction === "translate" ? "Translating…" : "Translate this language"}

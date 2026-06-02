@@ -24,6 +24,7 @@ const STORAGE_KEY = "selectedMetadataAppId";
 
 export function useMetadataEditor() {
   const [apps, setApps] = useState([]);
+  const [aiConfigured, setAiConfigured] = useState(false);
   const [selectedAppId, setSelectedAppId] = useState("");
   const [selectedLocale, setSelectedLocale] = useState(SOURCE_LOCALE);
   const [activeApp, setActiveApp] = useState(null);
@@ -75,6 +76,7 @@ export function useMetadataEditor() {
           "";
 
         setApps(payload.apps);
+        setAiConfigured(Boolean(payload.aiConfigured));
         setSelectedAppId(nextAppId);
 
         if (!nextAppId) {
@@ -377,8 +379,9 @@ export function useMetadataEditor() {
   }, [appendOutput, bulkLocales, reviewState, runAction, selectedAppId]);
 
   const selectedLocaleReviewed = Boolean(reviewState[selectedLocale]?.reviewed);
+  const selectedLocaleHasSource = Boolean(overview[SOURCE_LOCALE]?.hasContent);
   const canTranslateSelected =
-    TARGET_LOCALES.includes(selectedLocale) && Boolean(overview[SOURCE_LOCALE]?.hasContent);
+    aiConfigured && TARGET_LOCALES.includes(selectedLocale) && selectedLocaleHasSource;
   const translateSelectionCount = bulkLocales.filter((locale) =>
     TARGET_LOCALES.includes(locale),
   ).length;
@@ -407,6 +410,8 @@ export function useMetadataEditor() {
       canPublish:
         publishSelectionCount > 0 && !dirty && Boolean(activeApp?.bundleId),
       canTranslateSelected,
+      aiConfigured,
+      selectedLocaleHasSource,
       hasLimitWarnings,
       publishSelectionCount,
       selectedLocaleReviewed,

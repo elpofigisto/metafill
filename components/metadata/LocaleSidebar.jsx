@@ -171,7 +171,14 @@ export function LocaleSidebar({ actions, computed, state }) {
 
       <div className="sidebar-section bulk-actions">
         <button
-          disabled={loading || saving || busy || computed.translateSelectionCount === 0}
+          disabled={
+            loading ||
+            saving ||
+            busy ||
+            !computed.aiConfigured ||
+            computed.translateSelectionCount === 0
+          }
+          title={computed.aiConfigured ? undefined : "Add an AI API key in Settings to translate"}
           type="button"
           onClick={actions.translateBulk}
         >
@@ -184,6 +191,11 @@ export function LocaleSidebar({ actions, computed, state }) {
         >
           {publishLabel}
         </button>
+        {!computed.aiConfigured ? (
+          <p className="bulk-hint">
+            No AI key yet - add one in <a href="/settings">Settings</a> to translate.
+          </p>
+        ) : null}
         {!computed.canSync ? (
           <p className="bulk-hint">Set a bundle ID in Apps to enable sync and publish.</p>
         ) : null}
