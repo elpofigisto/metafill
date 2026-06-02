@@ -52,8 +52,20 @@ const EMPTY = {
   apiKeyPath: "",
   aiProvider: "anthropic",
   aiModel: "",
-  aiApiKey: "",
+  aiApiKeys: { anthropic: "", openai: "", google: "" },
 };
+
+// Build form state from a resolved-settings payload. We drop the scalar
+// `aiApiKey` (the active provider's key, kept only for server-side translate
+// code) so it can't sneak back in via the legacy-migration path on save.
+function toForm(resolved) {
+  const { aiApiKey: _ignore, aiApiKeys, ...rest } = resolved || {};
+  return {
+    ...EMPTY,
+    ...rest,
+    aiApiKeys: { ...EMPTY.aiApiKeys, ...(aiApiKeys || {}) },
+  };
+}
 
 export default function SettingsManager() {
   const [form, setForm] = useState(EMPTY);
@@ -77,7 +89,7 @@ export default function SettingsManager() {
     loadSettings()
       .then((payload) => {
         if (active) {
-          setForm({ ...EMPTY, ...payload.resolved });
+          setForm(toForm(payload.resolved));
           setFromEnv(payload.fromEnv || {});
           setKeyFile(payload.keyFile || { path: "", exists: false });
         }
@@ -101,6 +113,19 @@ export default function SettingsManager() {
   function updateField(key, value) {
     setForm((current) => ({ ...current, [key]: value }));
     setFromEnv((current) => ({ ...current, [key]: false }));
+    setDirty(true);
+    setMessage("");
+  }
+
+  function updateApiKey(provider, value) {
+    setForm((current) => ({
+      ...current,
+      aiApiKeys: { ...(current.aiApiKeys || {}), [provider]: value },
+    }));
+    setFromEnv((current) => ({
+      ...current,
+      aiApiKeys: { ...(current.aiApiKeys || {}), [provider]: false },
+    }));
     setDirty(true);
     setMessage("");
   }
@@ -138,7 +163,7 @@ export default function SettingsManager() {
 
     try {
       const provider = form.aiProvider || "anthropic";
-      const payload = await fetchModels(provider, form.aiApiKey);
+      const payload = await fetchModels(provider, form.aiApiKeys?.[provider] || "");
       const fetched = payload.models || [];
 
       setModels(fetched);
@@ -163,7 +188,7 @@ export default function SettingsManager() {
 
     try {
       const payload = await saveSettings(form);
-      setForm({ ...EMPTY, ...payload.resolved });
+      setForm(toForm(payload.resolved));
       setFromEnv(payload.fromEnv || {});
       setKeyFile(payload.keyFile || { path: "", exists: false });
       setDirty(false);
@@ -218,7 +243,7 @@ export default function SettingsManager() {
       const result = await importConfig(parsed);
       const fresh = await loadSettings();
 
-      setForm({ ...EMPTY, ...fresh.resolved });
+      setForm(toForm(fresh.resolved));
       setFromEnv(fresh.fromEnv || {});
       setKeyFile(fresh.keyFile || { path: "", exists: false });
       setDirty(false);
@@ -404,17 +429,22 @@ export default function SettingsManager() {
             <label>
               <span className="field-label">
                 API key
-                {fromEnv.aiApiKey ? <span className="env-tag">from .env</span> : null}
+                {fromEnv.aiApiKeys?.[form.aiProvider] ? (
+                  <span className="env-tag">from .env</span>
+                ) : null}
               </span>
               <input
                 autoComplete="off"
                 disabled={loading || saving}
                 placeholder="sk-…"
                 type="password"
-                value={form.aiApiKey}
-                onChange={(event) => updateField("aiApiKey", event.target.value)}
+                value={form.aiApiKeys?.[form.aiProvider] ?? ""}
+                onChange={(event) => updateApiKey(form.aiProvider, event.target.value)}
               />
-              <p className="field-hint">Your provider API key. Stored locally; excluded from Export.</p>
+              <p className="field-hint">
+                API key for the selected provider. Each provider keeps its own key. Stored locally;
+                excluded from Export.
+              </p>
             </label>
           </div>
         </section>

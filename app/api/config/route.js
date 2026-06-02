@@ -7,9 +7,14 @@ export const dynamic = "force-dynamic";
 const EXPORT_VERSION = 1;
 
 // Everything shareable, minus secrets: settings drop the .p8 path and the AI
-// API key; each app drops its apiKeyPath override.
+// API keys; each app drops its apiKeyPath override.
 function exportable({ settings, apps }) {
-  const { apiKeyPath: _drop, aiApiKey: _aiKey, ...sharedSettings } = settings;
+  const {
+    apiKeyPath: _drop,
+    aiApiKey: _legacyKey,
+    aiApiKeys: _aiKeys,
+    ...sharedSettings
+  } = settings;
 
   return {
     version: EXPORT_VERSION,
@@ -56,10 +61,10 @@ export async function POST(request) {
       apiKeyId: incomingSettings.apiKeyId ?? "",
       apiIssuerId: incomingSettings.apiIssuerId ?? "",
       apiKeyPath: existing.settings.apiKeyPath || "",
-      // AI provider/model are shareable; the AI key stays local.
+      // AI provider/model are shareable; the AI keys stay local, per provider.
       aiProvider: incomingSettings.aiProvider ?? existing.settings.aiProvider ?? "",
       aiModel: incomingSettings.aiModel ?? existing.settings.aiModel ?? "",
-      aiApiKey: existing.settings.aiApiKey || "",
+      aiApiKeys: existing.settings.aiApiKeys || {},
     };
 
     const savedApps = await saveApps(apps);

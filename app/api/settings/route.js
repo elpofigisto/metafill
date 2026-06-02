@@ -2,7 +2,7 @@ import { access } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 
-import { loadConfig, loadSettings, saveSettings } from "../../../lib/app-registry";
+import { AI_PROVIDERS, loadConfig, loadSettings, saveSettings } from "../../../lib/app-registry";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,6 @@ const SETTINGS_FIELDS = [
   "apiKeyPath",
   "aiProvider",
   "aiModel",
-  "aiApiKey",
 ];
 
 async function keyFileStatus(resolved) {
@@ -36,6 +35,14 @@ async function buildResponse(stored, resolved) {
 
   for (const field of SETTINGS_FIELDS) {
     fromEnv[field] = !stored[field] && Boolean(resolved[field]);
+  }
+
+  // Per-provider flag so the form can show "from .env" against the provider it
+  // belongs to, not a single shared key.
+  fromEnv.aiApiKeys = {};
+  for (const provider of AI_PROVIDERS) {
+    fromEnv.aiApiKeys[provider] =
+      !stored.aiApiKeys?.[provider] && Boolean(resolved.aiApiKeys?.[provider]);
   }
 
   return {

@@ -16,9 +16,7 @@ export async function POST(request) {
 
     if (!apiKey) {
       const settings = await loadSettings();
-      if (settings.aiProvider === provider) {
-        apiKey = settings.aiApiKey || "";
-      }
+      apiKey = settings.aiApiKeys?.[provider] || "";
     }
 
     const models = await listModels({ provider, apiKey });
