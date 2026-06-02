@@ -59,6 +59,21 @@ export function LocalePane({ actions, computed, state }) {
           <span className={computed.selectedLocaleReviewed ? "clean-pill" : "warning-pill"}>
             {computed.selectedLocaleReviewed ? "Reviewed" : "Needs review"}
           </span>
+          {!isSource ? (
+            <button
+              className="ghost-button"
+              disabled={loading || saving || busy || !computed.canTranslateSelected}
+              type="button"
+              onClick={actions.translateSelectedLocale}
+              title={
+                computed.canTranslateSelected
+                  ? "Translate this language from en-US"
+                  : "Add en-US source content first"
+              }
+            >
+              {busyAction === "translate" ? "Translating…" : "Translate this language"}
+            </button>
+          ) : null}
           <button
             className="ghost-button"
             disabled={loading || saving || busy || dirty || computed.hasLimitWarnings}

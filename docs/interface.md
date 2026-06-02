@@ -57,6 +57,10 @@ the selected locale on the right.
 ### Editor pane
 
 - **Locale title and code**, plus a **Reviewed / Needs review** pill.
+- **Translate this language** - machine-translates just the open locale from
+  en-US, without touching the sidebar's bulk selection. Shown for target locales
+  only (not the en-US source) and enabled once en-US has source content. If the
+  open locale has unsaved edits, it asks before overwriting them.
 - **Mark reviewed** - marks the open locale reviewed. Disabled while there are
   unsaved edits or a field is over its limit.
 - **Fields** - Name, Subtitle, Keywords (single-line, like App Store Connect),
@@ -92,7 +96,8 @@ Shared by every app; an app can override any of these under its Advanced section
   excluded from export.
 - **Share configuration** - **Export JSON** (Team ID, key IDs, apps list - never
   the `.p8` or AI key) and **Import JSON** (replaces the apps list and shared IDs,
-  keeps your local keys).
+  keeps your local keys). See [Team collaboration](collaboration.md) for the full
+  workflow.
 
 Resolution order for any credential is: per-app override, then global Settings,
 then environment variables in `.env`.

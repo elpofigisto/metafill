@@ -319,6 +319,28 @@ export function useMetadataEditor() {
     });
   }, [appendOutput, bulkLocales, runAction, selectedAppId, selectedLocale]);
 
+  const translateSelectedLocale = useCallback(() => {
+    if (!TARGET_LOCALES.includes(selectedLocale)) {
+      setError("Pick a target language to translate - the en-US source can't be translated.");
+      return undefined;
+    }
+
+    if (
+      dirty &&
+      !confirmDiscard("Translating overwrites this language from en-US. Discard unsaved changes?")
+    ) {
+      return undefined;
+    }
+
+    return runAction("translate", async () => {
+      const payload = await translateMetadata(selectedAppId, [selectedLocale], appendOutput);
+      const done = payload.locales || [selectedLocale];
+
+      setMessage(`Translated ${done.join(", ")} for ${payload.app?.name || ""}.`);
+      setReloadNonce((current) => current + 1);
+    });
+  }, [appendOutput, confirmDiscard, dirty, runAction, selectedAppId, selectedLocale]);
+
   const markSelectedLocaleReviewed = useCallback(
     () =>
       runAction("review", async () => {
@@ -355,6 +377,8 @@ export function useMetadataEditor() {
   }, [appendOutput, bulkLocales, reviewState, runAction, selectedAppId]);
 
   const selectedLocaleReviewed = Boolean(reviewState[selectedLocale]?.reviewed);
+  const canTranslateSelected =
+    TARGET_LOCALES.includes(selectedLocale) && Boolean(overview[SOURCE_LOCALE]?.hasContent);
   const translateSelectionCount = bulkLocales.filter((locale) =>
     TARGET_LOCALES.includes(locale),
   ).length;
@@ -374,6 +398,7 @@ export function useMetadataEditor() {
       setBulkSelection,
       toggleBulkLocale,
       translateBulk,
+      translateSelectedLocale,
       updateFile,
     },
     computed: {
@@ -381,6 +406,7 @@ export function useMetadataEditor() {
       canSync: Boolean(activeApp?.bundleId),
       canPublish:
         publishSelectionCount > 0 && !dirty && Boolean(activeApp?.bundleId),
+      canTranslateSelected,
       hasLimitWarnings,
       publishSelectionCount,
       selectedLocaleReviewed,
