@@ -25,3 +25,6 @@ gemini/
 # app metadata content (your products' listings) — generated/edited locally
 /fastlane/metadata/
 /apps/
+
+# TypeScript incremental build info
+*.tsbuildinfo
