@@ -15,18 +15,26 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "deliver:metadata": "node scripts/deliver-app-store-metadata.mjs",
-    "fetch:metadata": "node scripts/fetch-app-store-metadata.mjs",
-    "translate:metadata": "node scripts/translate-app-store-metadata.mjs",
-    "prompt:translations": "node scripts/build-translation-prompt.mjs",
-    "import:translations": "node scripts/import-translations.mjs"
+    "deliver:metadata": "tsx scripts/deliver-app-store-metadata.ts",
+    "fetch:metadata": "tsx scripts/fetch-app-store-metadata.ts",
+    "translate:metadata": "tsx scripts/translate-app-store-metadata.ts",
+    "prompt:translations": "tsx scripts/build-translation-prompt.ts",
+    "import:translations": "tsx scripts/import-translations.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "tsx": "^4.22.4"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.19",
+    "@types/react": "^19.2.16",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.3"
   }
 }
