@@ -1,0 +1,24 @@
+# Build artifacts & deps (reinstalled/rebuilt in the image)
+node_modules
+.next
+out
+*.tsbuildinfo
+npm-debug.log*
+
+# Secrets & local data — supplied at runtime via mounts + env, never baked in
+.env
+.env.*
+*.p8
+apps.config.json
+logs
+gemini
+fastlane/metadata
+apps
+.playwright-mcp
+
+# Repo / tooling not needed in the image
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+.dockerignore
