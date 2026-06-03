@@ -25,6 +25,10 @@ npm run dev
 
 Open the URL it prints (http://127.0.0.1:3000 by default).
 
+Prefer not to install Node/Ruby/Fastlane locally? Run it in a container instead -
+see [Docker](docker.md). The rest of this guide (setup, runs, sharing) applies
+either way.
+
 ## First-time setup
 
 Do these once. Everything is stored locally in `apps.config.json` (git-ignored).

@@ -22,6 +22,8 @@ machine with your own keys (BYOK), and sends nothing to any poTeam server.
   work across a team.
 - 💻 [Command-line usage](docs/cli.md) - the npm scripts and bring-your-own-model
   translation.
+- 🐳 [Docker](docs/docker.md) - run metafill in a container (Node + Ruby +
+  Fastlane bundled), no local toolchain needed.
 - 🗺️ [Roadmap](docs/roadmap.md) - ideas and planned work.
 
 ## Features
@@ -50,6 +52,9 @@ npm run dev
 Open the URL it prints, then follow [Getting started](docs/getting-started.md)
 to add your keys and your first app.
 
+Prefer containers? `cp apps.config.example.json apps.config.json && docker compose up --build`,
+then open <http://localhost:3000>. See [Docker](docs/docker.md).
+
 ## Your keys stay yours
 
 metafill is BYOK and runs entirely on your machine. It talks directly to Apple's
@@ -60,8 +65,9 @@ export omits every key.
 
 ## Contributing
 
-Pull requests are welcome. metafill is a small Next.js app with dependency-light
-Node scripts under `app/`, `components/`, `lib/`, and `scripts/`.
+Pull requests are welcome. metafill is a small, strict-TypeScript Next.js app with
+dependency-light scripts under `app/`, `components/`, `lib/`, and `scripts/`.
+Run `npm run typecheck` before sending a PR.
 
 ## License
 

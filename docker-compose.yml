@@ -1,0 +1,43 @@
+# metafill — local containerised run.
+#
+# Quick start:
+#   cp apps.config.example.json apps.config.json   # first run only
+#   docker compose up --build
+#   open http://localhost:3000
+#
+# Secrets stay on the host: provider API keys + App Store Connect IDs go in
+# .env (BYOK), and your .p8 key is mounted read-only. Nothing is baked into the
+# image and nothing is sent to any poTeam server.
+
+services:
+  metafill:
+    build: .
+    image: metafill:local
+    container_name: metafill
+    ports:
+      - "3000:3000"
+    # API keys (ANTHROPIC_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY) and
+    # App Store Connect creds (APP_STORE_CONNECT_TEAM_ID / _API_KEY_ID /
+    # _API_ISSUER_ID) can live here. Optional — the app also reads them from
+    # apps.config.json via the Settings UI.
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      # Config (account IDs + per-provider API keys) — persisted on the host.
+      # Create it first: cp apps.config.example.json apps.config.json
+      - ./apps.config.json:/app/apps.config.json
+      # Your products' metadata content — edited and persisted on the host.
+      - ./fastlane:/app/fastlane
+      # Per-run operation logs.
+      - ./logs:/app/logs
+
+      # App Store Connect .p8 signing key (needed only for Sync/Publish).
+      # Uncomment and point ASC_KEY_FILE at your key, then set
+      # APP_STORE_CONNECT_API_KEY_PATH=/keys/AuthKey.p8 below.
+      # - ${ASC_KEY_FILE:-./AuthKey.p8}:/keys/AuthKey.p8:ro
+
+    # environment:
+    #   APP_STORE_CONNECT_API_KEY_PATH: /keys/AuthKey.p8
+
+    restart: unless-stopped
