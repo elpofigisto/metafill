@@ -1,0 +1,144 @@
+.locale-pane {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.pane-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pane-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor {
+  display: grid;
+  gap: 14px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  gap: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.field-meta label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.field-meta p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.field-control {
+  min-width: 0;
+}
+
+.field-control input {
+  width: 100%;
+}
+
+.app-grid select,
+.advanced-grid select,
+.settings-grid select {
+  width: 100%;
+}
+
+.field-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 9px;
+}
+
+.count {
+  flex: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.count.over {
+  color: var(--error-text);
+}
+
+.save-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 2px;
+  border-top: 1px solid var(--line);
+  background: linear-gradient(to top, var(--bg) 70%, rgba(242, 239, 232, 0));
+  padding: 16px 0 4px;
+}
+
+.save-bar span {
+  color: var(--warn-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---------- Notices & output ---------- */
+
+.notice {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 12px 15px;
+  color: var(--text-2);
+  font-size: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.notice.success {
+  border-color: #b6ddc1;
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.notice.error {
+  border-color: #f0bcb4;
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.operation-output {
+  max-height: 280px;
+  overflow: auto;
+  border: 1px solid #2a2823;
+  border-radius: var(--radius);
+  background: #1b1a17;
+  color: #ece7dc;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- Apps & Settings pages ---------- */

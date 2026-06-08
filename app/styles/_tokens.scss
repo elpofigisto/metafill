@@ -1,0 +1,46 @@
+/* =====================================================================
+   metafill - design system
+   Inspired by 37signals / Basecamp: warm paper, confident type,
+   tactile buttons, soft shadowed cards, purposeful accent color.
+   ===================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* Warm paper neutrals */
+  --bg: #f2efe8;
+  --panel: #ffffff;
+  --panel-soft: #faf8f2;
+  --text: #211f1b;
+  --text-2: #423e37;
+  --muted: #7c766b;
+  --line: #e6e1d6;
+  --line-strong: #d7d1c2;
+
+  /* Accents */
+  --link: #2f6fed;
+  --focus: #2f6fed;
+  --green: #1c8a48;
+  --green-strong: #146a37;
+
+  /* Status tints */
+  --success-bg: #e7f3ea;
+  --success-text: #176b39;
+  --warn-bg: #fbefcd;
+  --warn-text: #8a5a00;
+  --error-bg: #fbe9e6;
+  --error-text: #a02d1f;
+  --info-bg: #e9f0fe;
+  --info-text: #1f51b5;
+
+  /* Shape & depth */
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px rgba(33, 31, 27, 0.06), 0 1px 1px rgba(33, 31, 27, 0.05);
+  --shadow: 0 4px 16px rgba(33, 31, 27, 0.09);
+
+  --font: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --mono: "SFMono-Regular", ui-monospace, "JetBrains Mono", Consolas,
+    "Liberation Mono", monospace;
+}

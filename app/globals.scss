@@ -1,0 +1,15 @@
+// metafill design system - entry point.
+// Plain CSS rules live in the partials below; @use emits them in cascade order.
+// Add @forward-ed Sass tokens/mixins to a partial and @use it here as needed.
+
+@use "styles/tokens";
+@use "styles/base";
+@use "styles/buttons";
+@use "styles/forms";
+@use "styles/badges";
+@use "styles/layout";
+@use "styles/sidebar";
+@use "styles/editor";
+@use "styles/settings";
+@use "styles/responsive";
+@use "styles/modal";

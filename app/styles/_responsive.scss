@@ -1,0 +1,40 @@
+@media (max-width: 920px) {
+  .aso-body {
+    grid-template-columns: 1fr;
+  }
+
+  .locale-sidebar {
+    position: static;
+    max-height: none;
+  }
+
+  .locale-list {
+    max-height: 320px;
+  }
+}
+
+@media (max-width: 720px) {
+  .field-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .settings-grid,
+  .app-grid,
+  .advanced-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-card-top,
+  .lookup-row {
+    grid-template-columns: 1fr;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .app-picker select {
+    max-width: none;
+  }
+}
