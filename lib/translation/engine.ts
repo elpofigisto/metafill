@@ -5,7 +5,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { translateText } from "../ai-provider";
-import { METADATA_FILES, metadataFileLimit } from "../app-store-metadata";
+import { isCopyVerbatimFile, METADATA_FILES, metadataFileLimit } from "../app-store-metadata";
 import { hasProp } from "../errors";
 import { clearLocaleReview } from "../review-state";
 import type { AppConfig } from "../types";
@@ -39,6 +39,12 @@ export async function readSourceMetadata(sourceDir: string): Promise<Map<string,
       entries.set(fileName, await readFile(filePath, "utf8"));
     } catch (error) {
       if (hasProp(error, "code") && error.code === "ENOENT") {
+        // URLs are optional; a listing without a marketing URL is still valid.
+        if (isCopyVerbatimFile(fileName)) {
+          entries.set(fileName, "");
+          continue;
+        }
+
         throw new Error(`Missing source metadata file: ${filePath}`);
       }
 
@@ -146,6 +152,26 @@ export async function translateLocale({
   await mkdir(outputDir, { recursive: true });
 
   for (const fileName of fields) {
+    // URLs are identical across languages: copy the source verbatim instead of
+    // spending tokens "translating" it. A blank source leaves the target file
+    // untouched so we never publish an empty URL over an existing one.
+    if (isCopyVerbatimFile(fileName)) {
+      const sourceUrl = (sourceEntries.get(fileName) ?? "").trim();
+
+      if (!sourceUrl) {
+        continue;
+      }
+
+      console.log(`Copying ${app.id}/${locale}/${fileName} (verbatim)...`);
+      translated.set(fileName, sourceUrl);
+      await writeFile(path.join(outputDir, fileName), `${sourceUrl}\n`, "utf8");
+      rows.push({
+        app: app.id,
+        ...validateGeneratedFile(locale, fileName, sourceUrl),
+      });
+      continue;
+    }
+
     console.log(`Translating ${app.id}/${locale}/${fileName}...`);
 
     // Keyword generation references the translated name/subtitle. If those

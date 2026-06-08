@@ -119,7 +119,10 @@ export type MetadataFile =
   | "description.txt"
   | "keywords.txt"
   | "promotional_text.txt"
-  | "release_notes.txt";
+  | "release_notes.txt"
+  | "support_url.txt"
+  | "marketing_url.txt"
+  | "privacy_url.txt";
 
 export const METADATA_FILES: MetadataFile[] = [
   "name.txt",
@@ -128,7 +131,25 @@ export const METADATA_FILES: MetadataFile[] = [
   "keywords.txt",
   "promotional_text.txt",
   "release_notes.txt",
+  "support_url.txt",
+  "marketing_url.txt",
+  "privacy_url.txt",
 ];
+
+/**
+ * Files that are copied verbatim from the en-US source to every locale instead
+ * of being translated. URLs are the same in every language, so the translate
+ * flow propagates the source value as-is rather than sending it to the AI.
+ */
+export const COPY_VERBATIM_FILES: ReadonlySet<MetadataFile> = new Set([
+  "support_url.txt",
+  "marketing_url.txt",
+  "privacy_url.txt",
+]);
+
+export function isCopyVerbatimFile(fileName: string): boolean {
+  return COPY_VERBATIM_FILES.has(fileName as MetadataFile);
+}
 
 export const FILE_LIMITS: Partial<Record<MetadataFile, number>> = {
   "name.txt": 30,
@@ -145,6 +166,9 @@ export const FILE_LABELS: Record<MetadataFile, string> = {
   "keywords.txt": "Keywords",
   "promotional_text.txt": "Promotional text",
   "release_notes.txt": "Release notes",
+  "support_url.txt": "Support URL",
+  "marketing_url.txt": "Marketing URL",
+  "privacy_url.txt": "Privacy Policy URL",
 };
 
 export const FILE_HELP: Record<MetadataFile, string> = {
@@ -154,6 +178,9 @@ export const FILE_HELP: Record<MetadataFile, string> = {
   "keywords.txt": "Maximum 100 characters. Use comma-separated keywords with no spaces after commas.",
   "promotional_text.txt": "Maximum 170 characters.",
   "release_notes.txt": "No App Store Connect character limit enforced by this tool.",
+  "support_url.txt": "Required by App Store Connect. Copied to every language as-is (never translated).",
+  "marketing_url.txt": "Optional. Copied to every language as-is (never translated).",
+  "privacy_url.txt": "Optional. Copied to every language as-is (never translated).",
 };
 
 export function charCount(value: string | null | undefined): number {

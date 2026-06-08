@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   FILE_LABELS,
   FILE_LIMITS,
+  isCopyVerbatimFile,
   LOCALE_LABELS,
   METADATA_FILES,
 } from "../../lib/app-store-metadata";
@@ -128,6 +129,11 @@ export function FieldSelectModal({ actions, state }: FieldSelectModalProps) {
 
           {METADATA_FILES.map((fileName) => {
             const limit = FILE_LIMITS[fileName];
+            const meta = isCopyVerbatimFile(fileName)
+              ? "copied as-is"
+              : limit
+                ? `${limit} chars`
+                : "no limit";
 
             return (
               <label className="field-select-row" key={fileName}>
@@ -137,7 +143,7 @@ export function FieldSelectModal({ actions, state }: FieldSelectModalProps) {
                   onChange={() => toggle(fileName)}
                 />
                 <span className="field-select-name">{FILE_LABELS[fileName]}</span>
-                <span className="field-select-meta">{limit ? `${limit} chars` : "no limit"}</span>
+                <span className="field-select-meta">{meta}</span>
               </label>
             );
           })}

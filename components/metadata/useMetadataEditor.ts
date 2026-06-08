@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { hasProp, toMessage } from "../../lib/errors";
 import {
+  ALL_LOCALES,
   SOURCE_LOCALE,
   TARGET_LOCALES,
   METADATA_FILES,
@@ -14,6 +15,7 @@ import {
   loadApps as apiLoadApps,
   loadMetadata as apiLoadMetadata,
   loadOverview as apiLoadOverview,
+  markAllReviewed as apiMarkAllReviewed,
   markReviewed,
   publishMetadata,
   saveMetadata as apiSaveMetadata,
@@ -72,6 +74,7 @@ export interface MetadataEditorComputed {
   selectedLocaleHasSource: boolean;
   hasLimitWarnings: boolean;
   publishSelectionCount: number;
+  reviewableCount: number;
   selectedLocaleReviewed: boolean;
   statuses: StatusMap;
   translateSelectionCount: number;
@@ -83,6 +86,7 @@ export interface MetadataEditorActions {
   changeLocale: (nextLocale: string) => void;
   confirmTranslate: (fields: string[]) => Promise<void> | undefined;
   fetchFromAppStore: (source: string) => Promise<void> | undefined;
+  markAllReviewed: () => Promise<void> | undefined;
   markSelectedLocaleReviewed: () => Promise<void>;
   publishBulk: () => Promise<void> | undefined;
   refresh: () => void;
@@ -451,6 +455,40 @@ export function useMetadataEditor(): MetadataEditor {
     [appendOutput, pendingTranslate, runAction, selectedAppId, selectedLocale],
   );
 
+  // Locales eligible to be marked reviewed: they have content and no field is
+  // over an App Store limit. en-US (the source) counts too.
+  const reviewableLocales = useMemo<string[]>(
+    () =>
+      (ALL_LOCALES as string[]).filter(
+        (locale) => overview[locale]?.hasContent && !overview[locale]?.overLimit,
+      ),
+    [overview],
+  );
+
+  const markAllReviewed = useCallback(() => {
+    if (reviewableLocales.length === 0) {
+      setError("No translated locales to mark reviewed.");
+      return undefined;
+    }
+
+    if (
+      dirty &&
+      !confirmDiscard("Marking all reviewed uses the saved files. Discard unsaved changes?")
+    ) {
+      return undefined;
+    }
+
+    return runAction("review-all", async () => {
+      const payload = await apiMarkAllReviewed(selectedAppId, reviewableLocales);
+
+      setReviewState(payload.reviewState || {});
+      // Select the reviewed locales so Publish immediately reflects them.
+      setBulkLocales(reviewableLocales);
+      setMessage(`Marked ${reviewableLocales.length} locales as reviewed.`);
+      setReloadNonce((current) => current + 1);
+    });
+  }, [confirmDiscard, dirty, reviewableLocales, runAction, selectedAppId]);
+
   const markSelectedLocaleReviewed = useCallback(
     () =>
       runAction("review", async () => {
@@ -504,6 +542,7 @@ export function useMetadataEditor(): MetadataEditor {
       changeLocale,
       confirmTranslate,
       fetchFromAppStore,
+      markAllReviewed,
       markSelectedLocaleReviewed,
       publishBulk,
       refresh,
@@ -524,6 +563,7 @@ export function useMetadataEditor(): MetadataEditor {
       selectedLocaleHasSource,
       hasLimitWarnings,
       publishSelectionCount,
+      reviewableCount: reviewableLocales.length,
       selectedLocaleReviewed,
       statuses,
       translateSelectionCount,

@@ -128,6 +128,7 @@ Usage:
 Fields:
   Defaults to all. Pass a comma-separated subset to translate only those:
   name.txt, subtitle.txt, description.txt, keywords.txt, promotional_text.txt, release_notes.txt
+  support_url.txt and marketing_url.txt are copied verbatim to each locale, not translated.
 
 AI provider:
   Configure provider, model, and API key in Settings (or via env:

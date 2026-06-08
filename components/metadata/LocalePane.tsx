@@ -10,7 +10,14 @@ import type { MetadataEditor, MetadataEditorState } from "./useMetadataEditor";
 
 // Single-line fields, like App Store Connect - prevents stray line breaks that
 // would otherwise count toward (and blow) the character limit.
-const SINGLE_LINE_FILES = new Set(["name.txt", "subtitle.txt", "keywords.txt"]);
+const SINGLE_LINE_FILES = new Set([
+  "name.txt",
+  "subtitle.txt",
+  "keywords.txt",
+  "support_url.txt",
+  "marketing_url.txt",
+  "privacy_url.txt",
+]);
 
 const TEXTAREA_ROWS: Record<string, number> = {
   "description.txt": 14,

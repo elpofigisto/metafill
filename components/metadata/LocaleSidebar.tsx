@@ -203,6 +203,19 @@ export function LocaleSidebar({ actions, computed, state }: LocaleSidebarProps) 
           {translateLabel}
         </button>
         <button
+          className="ghost-button"
+          disabled={loading || saving || busy || dirty || computed.reviewableCount === 0}
+          title={dirty ? "Save changes before marking reviewed" : undefined}
+          type="button"
+          onClick={actions.markAllReviewed}
+        >
+          {busyAction === "review-all"
+            ? "Marking…"
+            : computed.reviewableCount > 0
+              ? `Mark ${computed.reviewableCount} reviewed`
+              : "Mark all reviewed"}
+        </button>
+        <button
           disabled={!computed.canPublish || busy}
           type="button"
           onClick={actions.publishBulk}

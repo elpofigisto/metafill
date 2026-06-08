@@ -81,6 +81,22 @@ export async function setLocaleReviewed(
   return state;
 }
 
+export async function setLocalesReviewed(
+  metadataRoot: string,
+  locales: string[],
+  reviewed: boolean,
+): Promise<ReviewState> {
+  const state = await readReviewState(metadataRoot);
+  const reviewedAt = reviewed ? new Date().toISOString() : null;
+
+  for (const locale of locales) {
+    state.locales[locale] = { reviewed, reviewedAt };
+  }
+
+  await writeReviewState(metadataRoot, state);
+  return state;
+}
+
 export async function clearLocaleReview(
   metadataRoot: string,
   locale: string,

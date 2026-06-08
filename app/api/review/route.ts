@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
 
 import { findApp, metadataRootForApp } from "../../../lib/app-registry";
-import { assertSupportedLocale, normalizeLocale } from "../../../lib/app-store-metadata";
-import { readReviewState, setLocaleReviewed } from "../../../lib/review-state";
+import {
+  assertSupportedLocale,
+  normalizeLocale,
+  normalizeLocaleList,
+} from "../../../lib/app-store-metadata";
+import {
+  readReviewState,
+  setLocaleReviewed,
+  setLocalesReviewed,
+} from "../../../lib/review-state";
 import { toMessage } from "../../../lib/errors";
 import type { AppConfig } from "../../../lib/types";
 
@@ -43,10 +51,26 @@ export async function GET(request: Request) {
 export async function PUT(request: Request) {
   try {
     const { app, apps, metadataRoot } = await resolveApp(request);
-    const payload = (await request.json()) as { locale?: unknown; reviewed?: unknown };
-    const locale = normalizeLocale(String(payload.locale ?? ""));
+    const payload = (await request.json()) as {
+      locale?: unknown;
+      locales?: unknown;
+      reviewed?: unknown;
+    };
     const reviewed = Boolean(payload.reviewed);
 
+    // Bulk form: mark a list of locales at once (used by "Mark all reviewed").
+    if (payload.locales !== undefined) {
+      const locales = normalizeLocaleList(payload.locales);
+      const reviewState = await setLocalesReviewed(metadataRoot, locales, reviewed);
+
+      return NextResponse.json({
+        app,
+        apps,
+        reviewState: reviewState.locales,
+      });
+    }
+
+    const locale = normalizeLocale(String(payload.locale ?? ""));
     assertSupportedLocale(locale);
 
     const reviewState = await setLocaleReviewed(metadataRoot, locale, reviewed);

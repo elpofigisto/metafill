@@ -107,6 +107,11 @@ async function main(): Promise<void> {
       tempMetadataPath,
       "--platform",
       app.platform,
+      // Without --force, deliver's download_metadata prompts before overwriting
+      // and, when run non-interactively (as we do), silently downloads nothing.
+      // We download into a throwaway temp dir, so forcing overwrite is safe.
+      "--force",
+      "true",
       ...authArgs,
     ];
 

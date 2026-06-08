@@ -316,6 +316,14 @@ export function markReviewed(appId: string, locale: string): Promise<ReviewRespo
   });
 }
 
+export function markAllReviewed(appId: string, locales: string[]): Promise<ReviewResponse> {
+  return requestJson<ReviewResponse>(`/api/review?app=${encodeURIComponent(appId)}`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ locales, reviewed: true }),
+  });
+}
+
 export function publishMetadata(
   appId: string,
   locales: string[],

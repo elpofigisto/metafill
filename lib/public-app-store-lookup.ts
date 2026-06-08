@@ -63,8 +63,10 @@ interface ITunesLookupResponse {
   results?: ITunesLookupResult[];
 }
 
-/** A full set of metadata file contents for a single locale. */
-export type LocaleMetadata = Record<MetadataFile, string>;
+// A set of metadata file contents for a single locale. Partial because the
+// public iTunes lookup only provides a subset of fields (it has no URLs, for
+// example); files left undefined are not written, so existing ones survive.
+export type LocaleMetadata = Partial<Record<MetadataFile, string>>;
 
 /** Identifying fields used by the public App Store lookup. */
 type LookupApp = Pick<AppConfig, "id" | "appStoreId" | "bundleId">;
@@ -302,7 +304,14 @@ export async function writeLocaleMetadata(
   await mkdir(outputDir, { recursive: true });
 
   for (const fileName of METADATA_FILES) {
-    await writeFile(path.join(outputDir, fileName), `${files[fileName] || ""}\n`, "utf8");
+    const value = files[fileName];
+
+    // Leave files the lookup didn't provide (e.g. URLs) untouched.
+    if (value === undefined) {
+      continue;
+    }
+
+    await writeFile(path.join(outputDir, fileName), `${value}\n`, "utf8");
   }
 }
 
