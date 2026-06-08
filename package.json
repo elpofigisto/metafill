@@ -12,9 +12,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 4000",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 4000",
     "deliver:metadata": "tsx scripts/deliver-app-store-metadata.ts",
     "fetch:metadata": "tsx scripts/fetch-app-store-metadata.ts",
     "translate:metadata": "tsx scripts/translate-app-store-metadata.ts",
