@@ -5,7 +5,12 @@ import process from "node:process";
 
 import { loadApps, loadSettings, metadataRootForApp } from "../lib/app-registry.js";
 import { defaultModel } from "../lib/ai-provider.js";
-import { normalizeLocale, SOURCE_LOCALE, TARGET_LOCALES } from "../lib/app-store-metadata.js";
+import {
+  normalizeFieldList,
+  normalizeLocale,
+  SOURCE_LOCALE,
+  TARGET_LOCALES,
+} from "../lib/app-store-metadata.js";
 import { toMessage } from "../lib/errors";
 import { readSourceMetadata, translateLocale } from "../lib/translation/engine.js";
 import type { AppConfig } from "../lib/types";
@@ -15,6 +20,7 @@ interface ParsedArgs {
   app: string | null;
   locale: string | null;
   locales: string[] | null;
+  fields: string[] | null;
   help: boolean;
 }
 
@@ -39,6 +45,7 @@ function parseArgs(argv: string[]): ParsedArgs {
     app: null,
     locale: null,
     locales: null,
+    fields: null,
     help: false,
   };
 
@@ -88,6 +95,17 @@ function parseArgs(argv: string[]): ParsedArgs {
       continue;
     }
 
+    if (arg === "--fields") {
+      args.fields = argv[i + 1].split(",").map((field) => field.trim()).filter(Boolean);
+      i += 1;
+      continue;
+    }
+
+    if (arg.startsWith("--fields=")) {
+      args.fields = arg.slice("--fields=".length).split(",").map((field) => field.trim()).filter(Boolean);
+      continue;
+    }
+
     throw new Error(`Unknown argument: ${arg}`);
   }
 
@@ -105,6 +123,11 @@ Usage:
   npm run translate:metadata -- --locales uk,de,ja
   tsx scripts/translate-app-store-metadata.ts --app tidyshot --locale de
   tsx scripts/translate-app-store-metadata.ts --all-apps
+  tsx scripts/translate-app-store-metadata.ts --app tidyshot --fields name.txt,keywords.txt
+
+Fields:
+  Defaults to all. Pass a comma-separated subset to translate only those:
+  name.txt, subtitle.txt, description.txt, keywords.txt, promotional_text.txt, release_notes.txt
 
 AI provider:
   Configure provider, model, and API key in Settings (or via env:
@@ -190,6 +213,9 @@ async function main(): Promise<void> {
     );
   }
 
+  // null/empty -> all fields; otherwise a validated subset.
+  const selectedFields = normalizeFieldList(args.fields);
+
   const rootDir = process.cwd();
   const settings = await loadSettings(rootDir);
   const provider = settings.aiProvider;
@@ -217,7 +243,16 @@ async function main(): Promise<void> {
     const sourceEntries = await readSourceMetadata(sourceDir);
 
     for (const locale of locales) {
-      rows.push(...(await translateLocale({ ai, app, metadataRoot, sourceEntries, locale })));
+      rows.push(
+        ...(await translateLocale({
+          ai,
+          app,
+          metadataRoot,
+          sourceEntries,
+          locale,
+          selectedFields,
+        })),
+      );
     }
   }
 

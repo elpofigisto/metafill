@@ -112,30 +112,49 @@ async function translateField({
   return best;
 }
 
+async function readExistingTarget(outputDir: string, fileName: string): Promise<string> {
+  try {
+    return (await readFile(path.join(outputDir, fileName), "utf8")).trim();
+  } catch {
+    return "";
+  }
+}
+
 export async function translateLocale({
   ai,
   app,
   metadataRoot,
   sourceEntries,
   locale,
+  selectedFields = METADATA_FILES,
 }: {
   ai: TranslationAi;
   app: AppConfig;
   metadataRoot: string;
   sourceEntries: Map<string, string>;
   locale: string;
+  selectedFields?: readonly string[];
 }): Promise<TranslationRow[]> {
   const outputDir = path.join(metadataRoot, locale);
   const rows: TranslationRow[] = [];
   const translated = new Map<string, string>();
+  const fields = METADATA_FILES.filter((fileName) => selectedFields.includes(fileName));
   // Brand to keep untranslated: the listing's name before any colon (e.g.
   // "Hush: Screen Share Focus" -> "Hush"), falling back to the configured name.
   const brand = (sourceEntries.get("name.txt") || "").split(":")[0].trim() || app.name;
 
   await mkdir(outputDir, { recursive: true });
 
-  for (const fileName of METADATA_FILES) {
+  for (const fileName of fields) {
     console.log(`Translating ${app.id}/${locale}/${fileName}...`);
+
+    // Keyword generation references the translated name/subtitle. If those
+    // fields aren't part of this run, fall back to whatever is already on disk
+    // so a keywords-only translation keeps its context.
+    const translatedName =
+      translated.get("name.txt") ?? (await readExistingTarget(outputDir, "name.txt"));
+    const translatedSubtitle =
+      translated.get("subtitle.txt") ?? (await readExistingTarget(outputDir, "subtitle.txt"));
 
     const output = await translateField({
       ai,
@@ -143,8 +162,8 @@ export async function translateLocale({
       fileName,
       sourceText: sourceEntries.get(fileName) ?? "",
       locale,
-      translatedName: translated.get("name.txt"),
-      translatedSubtitle: translated.get("subtitle.txt"),
+      translatedName,
+      translatedSubtitle,
     });
 
     translated.set(fileName, output ?? "");

@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldSelectModal } from "./FieldSelectModal";
 import { LocalePane } from "./LocalePane";
 import { LocaleSidebar } from "./LocaleSidebar";
 import { TopBar } from "./TopBar";
@@ -15,6 +16,7 @@ export default function MetadataEditor() {
         <LocaleSidebar {...editor} />
         <LocalePane {...editor} />
       </div>
+      {editor.state.pendingTranslate ? <FieldSelectModal {...editor} /> : null}
     </main>
   );
 }

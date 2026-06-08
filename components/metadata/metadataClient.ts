@@ -302,9 +302,10 @@ export function fetchMetadata(
 export function translateMetadata(
   appId: string,
   locales: string[],
+  fields: string[],
   onChunk?: (text: string) => void,
 ): Promise<StreamResult> {
-  return postStream("/api/translate", { appId, locales }, onChunk);
+  return postStream("/api/translate", { appId, locales, fields }, onChunk);
 }
 
 export function markReviewed(appId: string, locale: string): Promise<ReviewResponse> {

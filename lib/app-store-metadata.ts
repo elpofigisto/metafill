@@ -198,3 +198,32 @@ export function normalizeLocaleList(
 
   return normalized;
 }
+
+/**
+ * Validate a requested subset of metadata files to translate. An empty or
+ * missing value means "all fields" - callers that want a strict subset should
+ * pass a non-empty array. Order follows METADATA_FILES so dependent fields
+ * (keywords after name/subtitle) keep their natural sequence.
+ */
+export function normalizeFieldList(fields: unknown): MetadataFile[] {
+  if (fields == null || (Array.isArray(fields) && fields.length === 0)) {
+    return [...METADATA_FILES];
+  }
+
+  if (!Array.isArray(fields)) {
+    throw new Error("Fields must be a list of metadata file names.");
+  }
+
+  const requested = new Set(fields.map((field) => String(field).trim()));
+  const unknown = [...requested].filter(
+    (field) => !METADATA_FILES.includes(field as MetadataFile),
+  );
+
+  if (unknown.length > 0) {
+    throw new Error(
+      `Unsupported field: ${unknown.join(", ")}. Supported fields: ${METADATA_FILES.join(", ")}`,
+    );
+  }
+
+  return METADATA_FILES.filter((fileName) => requested.has(fileName));
+}

@@ -36,6 +36,11 @@ const STORAGE_KEY = "selectedMetadataAppId";
 type LocaleOverviewMap = Record<string, LocaleOverview>;
 type StatusMap = Record<string, FileStatus>;
 
+/** A translation request awaiting field selection in the popup. */
+export interface PendingTranslate {
+  locales: string[];
+}
+
 export interface MetadataEditorState {
   activeApp: AppPayload | null;
   apps: AppPayload[];
@@ -49,6 +54,7 @@ export interface MetadataEditorState {
   missing: string[];
   operationOutput: string;
   overview: LocaleOverviewMap;
+  pendingTranslate: PendingTranslate | null;
   refreshing: boolean;
   reviewState: ReviewState;
   saving: boolean;
@@ -72,8 +78,10 @@ export interface MetadataEditorComputed {
 }
 
 export interface MetadataEditorActions {
+  cancelTranslate: () => void;
   changeApp: (nextAppId: string) => void;
   changeLocale: (nextLocale: string) => void;
+  confirmTranslate: (fields: string[]) => Promise<void> | undefined;
   fetchFromAppStore: (source: string) => Promise<void> | undefined;
   markSelectedLocaleReviewed: () => Promise<void>;
   publishBulk: () => Promise<void> | undefined;
@@ -81,8 +89,8 @@ export interface MetadataEditorActions {
   saveMetadata: (event?: React.FormEvent<HTMLFormElement>) => Promise<void>;
   setBulkSelection: (locales: string[]) => void;
   toggleBulkLocale: (locale: string) => void;
-  translateBulk: () => Promise<void> | undefined;
-  translateSelectedLocale: () => Promise<void> | undefined;
+  translateBulk: () => void;
+  translateSelectedLocale: () => void;
   updateFile: (fileName: string, value: string) => void;
 }
 
@@ -104,6 +112,7 @@ export function useMetadataEditor(): MetadataEditor {
   const [overview, setOverview] = useState<LocaleOverviewMap>({});
   const [summary, setSummary] = useState<OverviewSummary>({ total: 0, reviewed: 0, translated: 0 });
   const [bulkLocales, setBulkLocales] = useState<string[]>([]);
+  const [pendingTranslate, setPendingTranslate] = useState<PendingTranslate | null>(null);
   const [reloadNonce, setReloadNonce] = useState<number>(0);
   const [refreshNonce, setRefreshNonce] = useState<number>(0);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -375,45 +384,72 @@ export function useMetadataEditor(): MetadataEditor {
     [appendOutput, runAction, selectedAppId],
   );
 
+  // Both translate buttons open the field-selection popup instead of firing
+  // immediately; confirmTranslate runs the request once fields are chosen.
   const translateBulk = useCallback(() => {
     const targets = bulkLocales.filter((locale) => TARGET_LOCALES.includes(locale));
 
     if (targets.length === 0) {
       setError("Select one or more target locales to translate.");
-      return undefined;
+      return;
     }
 
-    return runAction("translate", async () => {
-      const payload = await translateMetadata(selectedAppId, targets, appendOutput);
-      const done = payload.locales || targets;
-
-      setMessage(`Translated ${done.join(", ")} for ${payload.app?.name || ""}.`);
-      setSelectedLocale(done[0] || selectedLocale);
-      setReloadNonce((current) => current + 1);
-    });
-  }, [appendOutput, bulkLocales, runAction, selectedAppId, selectedLocale]);
+    setError("");
+    setPendingTranslate({ locales: targets });
+  }, [bulkLocales]);
 
   const translateSelectedLocale = useCallback(() => {
     if (!TARGET_LOCALES.includes(selectedLocale)) {
       setError("Pick a target language to translate - the en-US source can't be translated.");
-      return undefined;
+      return;
     }
 
     if (
       dirty &&
       !confirmDiscard("Translating overwrites this language from en-US. Discard unsaved changes?")
     ) {
-      return undefined;
+      return;
     }
 
-    return runAction("translate", async () => {
-      const payload = await translateMetadata(selectedAppId, [selectedLocale], appendOutput);
-      const done = payload.locales || [selectedLocale];
+    setError("");
+    setPendingTranslate({ locales: [selectedLocale] });
+  }, [confirmDiscard, dirty, selectedLocale]);
 
-      setMessage(`Translated ${done.join(", ")} for ${payload.app?.name || ""}.`);
-      setReloadNonce((current) => current + 1);
-    });
-  }, [appendOutput, confirmDiscard, dirty, runAction, selectedAppId, selectedLocale]);
+  const cancelTranslate = useCallback(() => {
+    setPendingTranslate(null);
+  }, []);
+
+  const confirmTranslate = useCallback(
+    (fields: string[]) => {
+      const pending = pendingTranslate;
+
+      if (!pending) {
+        return undefined;
+      }
+
+      setPendingTranslate(null);
+
+      if (fields.length === 0) {
+        setError("Select at least one field to translate.");
+        return undefined;
+      }
+
+      return runAction("translate", async () => {
+        const payload = await translateMetadata(
+          selectedAppId,
+          pending.locales,
+          fields,
+          appendOutput,
+        );
+        const done = payload.locales || pending.locales;
+
+        setMessage(`Translated ${done.join(", ")} for ${payload.app?.name || ""}.`);
+        setSelectedLocale(done[0] || selectedLocale);
+        setReloadNonce((current) => current + 1);
+      });
+    },
+    [appendOutput, pendingTranslate, runAction, selectedAppId, selectedLocale],
+  );
 
   const markSelectedLocaleReviewed = useCallback(
     () =>
@@ -463,8 +499,10 @@ export function useMetadataEditor(): MetadataEditor {
 
   return {
     actions: {
+      cancelTranslate,
       changeApp,
       changeLocale,
+      confirmTranslate,
       fetchFromAppStore,
       markSelectedLocaleReviewed,
       publishBulk,
@@ -503,6 +541,7 @@ export function useMetadataEditor(): MetadataEditor {
       missing,
       operationOutput,
       overview,
+      pendingTranslate,
       refreshing,
       reviewState,
       saving,
