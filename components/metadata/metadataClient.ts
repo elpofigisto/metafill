@@ -119,7 +119,7 @@ interface ApiErrorPayload {
   [key: string]: unknown;
 }
 
-async function requestJson<T>(url: string, options?: RequestInit): Promise<T> {
+export async function requestJson<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, options);
   const payload = (await response.json()) as ApiErrorPayload;
 

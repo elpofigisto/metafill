@@ -83,6 +83,17 @@ Each app is a card:
   or key.
 - **Add app**, **Remove**, **Save apps**.
 
+## In-app purchases screen
+
+Open **In-app purchases** from the top bar. Pick the app, then **Fetch from App
+Store Connect** to load every in-app purchase with its localized display name
+and description. Each product shows the languages it has; **Show all N
+languages** adds empty rows for the rest. Counters turn red past the 30 / 45
+character limits. **Save** writes `in_app_purchases.json`; **Review changes to
+publish** compares the saved file with App Store Connect and lists each new or
+changed localization, and **Upload** sends exactly that list. Products removed
+from sale are hidden unless you show them.
+
 ## Settings screen
 
 Shared by every app; an app can override any of these under its Advanced section.

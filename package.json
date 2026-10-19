@@ -17,6 +17,8 @@
     "start": "next start -p 4000",
     "deliver:metadata": "tsx scripts/deliver-app-store-metadata.ts",
     "fetch:metadata": "tsx scripts/fetch-app-store-metadata.ts",
+    "fetch:iap": "tsx scripts/fetch-in-app-purchases.ts",
+    "deliver:iap": "tsx scripts/deliver-in-app-purchases.ts",
     "translate:metadata": "tsx scripts/translate-app-store-metadata.ts",
     "prompt:translations": "tsx scripts/build-translation-prompt.ts",
     "import:translations": "tsx scripts/import-translations.ts",

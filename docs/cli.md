@@ -35,6 +35,22 @@ draft. Requires `--confirm`, and each locale must be marked reviewed. It does
 **not** submit for review. Fastlane output streams live and is also written to a
 timestamped file in `logs/`.
 
+## In-app purchases
+
+```bash
+npm run fetch:iap -- --app myapp                 # App Store Connect -> in_app_purchases.json
+npm run deliver:iap -- --app myapp               # dry run: list what would change
+npm run deliver:iap -- --app myapp --confirm     # upload those changes
+```
+
+In-app purchase display names (30 characters) and descriptions (45 characters)
+live in `in_app_purchases.json`, next to the app's `fastlane/metadata` folder.
+fastlane cannot edit them, so metafill calls the App Store Connect API directly
+with the same `.p8` key (a raw `.p8` path is required, plus Key ID and Issuer
+ID). `fetch:iap` replaces the file with what App Store Connect has.
+`deliver:iap` creates missing localizations and updates changed ones; it never
+deletes anything, and `--locales a,b` limits it to some locales.
+
 ## Translate with another model (bring your own)
 
 To use a model you do not have an API key wired up for, generate a prompt, run
