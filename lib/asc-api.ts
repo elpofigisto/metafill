@@ -1,6 +1,7 @@
 // Minimal App Store Connect REST API client. fastlane `deliver` covers the app
-// listing, but it can't touch in-app purchase localizations, so those go
-// straight to the API with the same .p8 key metafill already uses.
+// listing, but it can't touch in-app purchase localizations or read customer
+// reviews, so those go straight to the API with the same .p8 key metafill
+// already uses.
 
 import { createSign } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -16,15 +17,19 @@ export interface AscResource<A = Record<string, unknown>> {
   type: string;
   id: string;
   attributes: A;
+  relationships?: Record<string, { data?: { type: string; id: string } | null }>;
 }
 
 interface AscListResponse<A> {
   data: AscResource<A>[];
+  included?: AscResource[];
   links?: { next?: string };
 }
 
 export interface AscClient {
   list<A>(pathOrUrl: string): Promise<AscResource<A>[]>;
+  /** Every page of a list together with the resources asked for via `include=`. */
+  listWithIncluded<A>(pathOrUrl: string): Promise<{ data: AscResource<A>[]; included: AscResource[] }>;
   send<A>(method: "POST" | "PATCH", apiPath: string, body: unknown): Promise<AscResource<A>>;
 }
 
@@ -69,12 +74,12 @@ export async function createAscClient(
 
   if (!keyPath || !creds.apiKeyId || !creds.apiIssuerId) {
     throw new Error(
-      "In-app purchases need an App Store Connect API key: set Key ID, Issuer ID, and the .p8 key path in Settings.",
+      "This needs an App Store Connect API key: set Key ID, Issuer ID, and the .p8 key path in Settings.",
     );
   }
 
   if (keyPath.toLowerCase().endsWith(".json")) {
-    throw new Error("In-app purchases need the raw .p8 key path, not a fastlane JSON descriptor.");
+    throw new Error("This needs the raw .p8 key path, not a fastlane JSON descriptor.");
   }
 
   const privateKey = await readFile(path.resolve(rootDir, keyPath), "utf8");
@@ -109,19 +114,26 @@ export async function createAscClient(
     return json;
   }
 
+  async function listWithIncluded<A>(pathOrUrl: string) {
+    const data: AscResource<A>[] = [];
+    const included: AscResource[] = [];
+    let next: string | undefined = pathOrUrl;
+
+    while (next) {
+      const page = (await request("GET", next)) as AscListResponse<A>;
+      data.push(...page.data);
+      included.push(...(page.included ?? []));
+      next = page.links?.next;
+    }
+
+    return { data, included };
+  }
+
   return {
     async list<A>(pathOrUrl: string) {
-      const items: AscResource<A>[] = [];
-      let next: string | undefined = pathOrUrl;
-
-      while (next) {
-        const page = (await request("GET", next)) as AscListResponse<A>;
-        items.push(...page.data);
-        next = page.links?.next;
-      }
-
-      return items;
+      return (await listWithIncluded<A>(pathOrUrl)).data;
     },
+    listWithIncluded,
     async send<A>(method: "POST" | "PATCH", apiPath: string, body: unknown) {
       const result = (await request(method, apiPath, body)) as { data: AscResource<A> };
       return result.data;

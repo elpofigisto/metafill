@@ -51,6 +51,20 @@ ID). `fetch:iap` replaces the file with what App Store Connect has.
 `deliver:iap` creates missing localizations and updates changed ones; it never
 deletes anything, and `--locales a,b` limits it to some locales.
 
+## Ratings and reviews
+
+```bash
+npm run fetch:reviews -- --app myapp             # App Store Connect -> customer_reviews.json
+```
+
+Read-only. Saves every written review (stars, text, country, developer response)
+from the App Store Connect API to `customer_reviews.json`, next to the app's
+`fastlane/metadata` folder, and prints the average plus a per-country table. For
+iPhone/iPad and Apple TV apps it also queries the public App Store lookup in every
+storefront for rating totals that include star-only ratings. Apple doesn't publish
+those totals for Mac apps, so for them only written reviews are counted. Needs a
+key that can read customer reviews (Admin, App Manager, or Customer Support).
+
 ## Translate with another model (bring your own)
 
 To use a model you do not have an API key wired up for, generate a prompt, run

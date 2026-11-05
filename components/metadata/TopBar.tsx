@@ -41,6 +41,9 @@ export function TopBar({ actions, computed, state }: TopBarProps) {
         <Link className="nav-link" href="/iap">
           In-app purchases
         </Link>
+        <Link className="nav-link" href="/reviews">
+          Reviews
+        </Link>
         <Link className="nav-link" href="/apps">
           Apps
         </Link>

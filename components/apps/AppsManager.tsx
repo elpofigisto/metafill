@@ -164,6 +164,9 @@ export default function AppsManager() {
           <Link className="nav-link" href="/iap">
             In-app purchases
           </Link>
+          <Link className="nav-link" href="/reviews">
+            Reviews
+          </Link>
           <Link className="nav-link" href="/settings">
             Settings
           </Link>

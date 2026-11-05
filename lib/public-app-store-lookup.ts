@@ -57,6 +57,10 @@ interface ITunesLookupResult {
   bundleId?: string;
   description?: string;
   releaseNotes?: string;
+  averageUserRating?: number;
+  userRatingCount?: number;
+  averageUserRatingForCurrentVersion?: number;
+  userRatingCountForCurrentVersion?: number;
 }
 
 interface ITunesLookupResponse {
@@ -149,7 +153,7 @@ async function lookupResultForCountry(
   }
 }
 
-async function mapWithConcurrency<T, R>(
+export async function mapWithConcurrency<T, R>(
   items: T[],
   limit: number,
   fn: (item: T) => Promise<R>,
@@ -167,6 +171,27 @@ async function mapWithConcurrency<T, R>(
 
   await Promise.all(workers);
   return results;
+}
+
+/**
+ * Public rating totals for one storefront (two-letter country code), or null
+ * when the app isn't sold there or the lookup fails. Mac apps always come back
+ * with zero ratings here: Apple doesn't publish their totals.
+ */
+export async function lookupStorefrontRating(
+  app: LookupApp,
+  country: string,
+): Promise<{ average: number; count: number; currentVersionAverage: number; currentVersionCount: number } | null> {
+  const result = await lookupResultForCountry(app, country);
+  if (!result) {
+    return null;
+  }
+  return {
+    average: Number(result.averageUserRating ?? 0),
+    count: Number(result.userRatingCount ?? 0),
+    currentVersionAverage: Number(result.averageUserRatingForCurrentVersion ?? 0),
+    currentVersionCount: Number(result.userRatingCountForCurrentVersion ?? 0),
+  };
 }
 
 // Look up an app by bundle ID or App Store ID and return the key identifying

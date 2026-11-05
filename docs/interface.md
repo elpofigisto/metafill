@@ -94,6 +94,27 @@ publish** compares the saved file with App Store Connect and lists each new or
 changed localization, and **Upload** sends exactly that list. Products removed
 from sale are hidden unless you show them.
 
+## Ratings & reviews screen
+
+Open **Reviews** from the top bar. Pick the app, then **Fetch from App Store
+Connect** to load every written review (stars, title, text, country, and your
+developer response) and save it to `customer_reviews.json`. Nothing is ever sent
+back: the screen is read-only.
+
+- **Summary** - the average of written reviews with a 5-to-1 star breakdown, the
+  overall rating across all countries (see below), and how many reviews still
+  have no developer response.
+- **By country** - one row per country: written reviews, their average, the
+  star breakdown, reviews without a response, and the latest review date. For
+  iPhone/iPad and Apple TV apps it also shows each country's public rating total
+  and average, which include star-only ratings. Click a row to filter the list.
+- **Reviews** - filter by country, stars, or "No response only".
+
+Apple doesn't publish rating totals for Mac apps (the public App Store lookup
+reports zero for every Mac app), so for Mac apps the numbers come from written
+reviews only. Star-only ratings are visible only on the Ratings page in App
+Store Connect.
+
 ## Settings screen
 
 Shared by every app; an app can override any of these under its Advanced section.

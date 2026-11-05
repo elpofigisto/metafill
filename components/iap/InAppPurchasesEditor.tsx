@@ -300,6 +300,9 @@ export default function InAppPurchasesEditor() {
           <Link className="nav-link" href="/">
             Metadata
           </Link>
+          <Link className="nav-link" href="/reviews">
+            Reviews
+          </Link>
           <Link className="nav-link" href="/apps">
             Apps
           </Link>
