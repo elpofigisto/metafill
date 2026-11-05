@@ -190,8 +190,10 @@ async function main(): Promise<void> {
     // Inherit stdio so fastlane streams live to the terminal and any prompt is
     // visible and answerable (piped stdio would hang invisibly on a prompt).
     // Tee everything to logs/ so each run is inspectable afterwards.
+    // Run from tempDir: deliver asks to "setup deliver" (and crashes when
+    // non-interactive) unless it finds a ./metadata folder or a Deliverfile.
     await runInherit("fastlane", fastlaneArgsForDeliver(app, tempMetadataPath, authArgs), {
-      cwd: rootDir,
+      cwd: tempDir,
       env: {
         ...process.env,
         FASTLANE_SKIP_UPDATE_CHECK: "1",
