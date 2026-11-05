@@ -312,6 +312,12 @@ export default function SettingsManager() {
           <Link className="nav-link" href="/apps">
             Apps
           </Link>
+          <Link className="nav-link" href="/iap">
+            In-app purchases
+          </Link>
+          <Link className="nav-link" href="/reviews">
+            Reviews
+          </Link>
           <span className={dirty ? "dirty-pill" : "clean-pill"}>
             {dirty ? "Unsaved changes" : "Saved"}
           </span>

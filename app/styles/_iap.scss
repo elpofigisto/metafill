@@ -1,0 +1,118 @@
+.iap-shell {
+  width: min(1180px, calc(100% - 40px));
+}
+
+.iap-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.iap-shell > .notice {
+  margin-bottom: 16px;
+}
+
+.iap-products {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.iap-product h2 {
+  margin: 0;
+}
+
+.iap-product-meta {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.iap-table {
+  display: grid;
+  gap: 6px;
+}
+
+.iap-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 200px) minmax(0, 2fr) minmax(0, 3fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.iap-head {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.iap-head small {
+  font-weight: 500;
+  text-transform: none;
+}
+
+.iap-locale {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.iap-locale code {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 400;
+}
+
+.iap-cell {
+  position: relative;
+  display: block;
+}
+
+.iap-cell input {
+  width: 100%;
+  padding-right: 58px;
+}
+
+.iap-cell .count {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+.iap-pending {
+  margin-bottom: 16px;
+}
+
+.iap-pending ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+}
+
+@media (max-width: 760px) {
+  .iap-shell .toolbar,
+  .iap-shell .panel-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .iap-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .iap-head {
+    display: none;
+  }
+}

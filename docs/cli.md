@@ -35,6 +35,36 @@ draft. Requires `--confirm`, and each locale must be marked reviewed. It does
 **not** submit for review. Fastlane output streams live and is also written to a
 timestamped file in `logs/`.
 
+## In-app purchases
+
+```bash
+npm run fetch:iap -- --app myapp                 # App Store Connect -> in_app_purchases.json
+npm run deliver:iap -- --app myapp               # dry run: list what would change
+npm run deliver:iap -- --app myapp --confirm     # upload those changes
+```
+
+In-app purchase display names (30 characters) and descriptions (45 characters)
+live in `in_app_purchases.json`, next to the app's `fastlane/metadata` folder.
+fastlane cannot edit them, so metafill calls the App Store Connect API directly
+with the same `.p8` key (a raw `.p8` path is required, plus Key ID and Issuer
+ID). `fetch:iap` replaces the file with what App Store Connect has.
+`deliver:iap` creates missing localizations and updates changed ones; it never
+deletes anything, and `--locales a,b` limits it to some locales.
+
+## Ratings and reviews
+
+```bash
+npm run fetch:reviews -- --app myapp             # App Store Connect -> customer_reviews.json
+```
+
+Read-only. Saves every written review (stars, text, country, developer response)
+from the App Store Connect API to `customer_reviews.json`, next to the app's
+`fastlane/metadata` folder, and prints the average plus a per-country table. For
+iPhone/iPad and Apple TV apps it also queries the public App Store lookup in every
+storefront for rating totals that include star-only ratings. Apple doesn't publish
+those totals for Mac apps, so for them only written reviews are counted. Needs a
+key that can read customer reviews (Admin, App Manager, or Customer Support).
+
 ## Translate with another model (bring your own)
 
 To use a model you do not have an API key wired up for, generate a prompt, run
